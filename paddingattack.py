@@ -8,7 +8,7 @@ import socket
 import re 
 import sys
 import os
-import subprocess
+#import subprocess
 
 def mypaddingCorrect(ciphertext):
     f = open("tempjunk", 'wb')
@@ -16,7 +16,7 @@ def mypaddingCorrect(ciphertext):
     f.close()
     status = 1
     oscommand = "openssl aes-128-cbc -d -in tempjunk -K 1239ddf -iv 85D4856F1735F596B7266C93A4836C8C"
-    command = ["openssl", "aes-128-cbc", "-d", "-in", ciphertext, "-K", "1239ddf", "-iv", "85D4856F1735F596B7266C93A4836C8C"]
+    #command = ["openssl", "aes-128-cbc", "-d", "-in", ciphertext, "-K", "1239ddf", "-iv", "85D4856F1735F596B7266C93A4836C8C"]
     try:
         #status = subprocess.call(command)
         status = os.system(oscommand)
@@ -40,13 +40,13 @@ def paddingCorrect(ciphertext):
         return True
 
 def findByte(xorblock, tgtblock, byteindex): #assumes that byteindex+1:endofblock is padded properly byteindex+1, i.e. that sending the ciphertext with the given xorblock and tgtblock gets a "yes" from the oracle. Everything is bytes, in and out
-    print("Our bytes are:\n")
-    print(tgtblock[byteindex]) #blocks come in as bytes, this should make them decimals
-    print(tgtblock[byteindex:byteindex+1], bytes((tgtblock[byteindex],)))
-    print(xorblock[byteindex])
-    print(xorblock[byteindex:byteindex+1], bytes((xorblock[byteindex],)))
+    #print("Our bytes are:\n")
+    #print(tgtblock[byteindex]) #blocks come in as bytes, this should make them decimals
+    #print(tgtblock[byteindex:byteindex+1], bytes((tgtblock[byteindex],)))
+    #print(xorblock[byteindex])
+    #print(xorblock[byteindex:byteindex+1], bytes((xorblock[byteindex],)))
     padbytesdec = 16 - byteindex
-    print(padbytesdec)
+    #print(padbytesdec)
     extrapadding = b''
     for i in range(padbytesdec-1):
         tempdec = xorblock[15-i]^(padbytesdec-1)^padbytesdec
@@ -54,18 +54,19 @@ def findByte(xorblock, tgtblock, byteindex): #assumes that byteindex+1:endofbloc
     for ptguessdec in range(256): 
         testbytedec = xorblock[byteindex]^padbytesdec^ptguessdec#NEXT LINE IS THE PROBLEM-- need to increment the padding not just replicate it
         modxorblock = xorblock[:byteindex]+bytes((testbytedec,))+extrapadding#The testbytedec is correct but you're not converting it to hex properly Try +bytes((subbytedec,))  old code +chr(subbytedec).encode()+
-        print(xorblock+tgtblock)
-        print(modxorblock+tgtblock)
-        print("\n\nOracleResults (orgct, modct)")
+        #print(xorblock+tgtblock)
+        #print(modxorblock+tgtblock)
+        #print("\n\nOracleResults (orgct, modct)")
         #print(paddingCorrect(xorblock+tgtblock))
         #print(paddingCorrect(modxorblock+tgtblock))
-        print("\n\n")
+        #print("\n\n")
         if paddingCorrect(modxorblock+tgtblock):
-            print("PT byte found "+str(ptguessdec)+" (dec) ",bytes((ptguessdec,)))#str(chr(ptguessdec).encode())+" (byte)")
-            print(bytes((ptguessdec,)))
+            #print("PT byte found "+str(ptguessdec)+" (dec) ",bytes((ptguessdec,)))#str(chr(ptguessdec).encode())+" (byte)")
+            #print(bytes((ptguessdec,)))
             return modxorblock, bytes((ptguessdec,))
         else:
-            print("Incorrect guess: "+str(ptguessdec)+" (dec) "+str(chr(ptguessdec).encode())+" (byte)")
+            #print("Incorrect guess: "+str(ptguessdec)+" (dec) "+str(chr(ptguessdec).encode())+" (byte)")
+            pass
     sys.exit(1)
 
 def findBlock(iv, ciphertext, blockindex):
@@ -80,8 +81,8 @@ def findBlock(iv, ciphertext, blockindex):
     for i in range(15,-1,-1):#(15,-1,-1):
         modxorblock, latestbyte = findByte(modxorblock, tgtblock, i)#, xorblock[i], i)   #xorblock -- why does it cast to str without slicing?
         tgtpt = latestbyte + tgtpt
-        print("\n\nUPDATED TARGET PLAINTEXT:\n\n") 
-        print(tgtpt)
+        #print("\n\nUPDATED TARGET PLAINTEXT:\n\n") 
+        #print(tgtpt)
     return tgtpt 
 
 def findPlaintext(iv, ciphertext):
@@ -110,7 +111,7 @@ def main():
     #print("\n\nOUTPUT of findBlock(iv,relevantct,1)\n\n")
     #print(tempjunk)
     pt = findPlaintext(iv, relevantct)
-    print("\n\n\nPLAINTEXT:")
+    #print("\n\n\nPLAINTEXT:")
     print(pt)
 
 if __name__ == '__main__':

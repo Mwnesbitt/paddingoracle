@@ -33,6 +33,7 @@ def paddingCorrect(ciphertext):
     s.sendall(ciphertext)
     reply = s.recv(1000)
     match = re.search("Padding error",str(reply))
+    #print("Oracle Contacted")
     if match:
         return False
     else:
